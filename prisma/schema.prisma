@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Worksheet {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+
+  // Relational fields
+  questionIds Int[]
+  questions   Question[]
+}
+
+
+model Question {
+  id     Int      @id @default(autoincrement())
+  body   String   @db.VarChar(255)
+
+  // Relational fields
+  answerIds     Int[]
+  answers       Answer[]
+  worksheetId   Int
+  worksheet     Worksheet @relation(fields: [worksheetId], references: [id])
+}
+
+model Answer {
+  id        Int       @id @default(autoincrement())
+  body      String    @db.VarChar(255)
+  correct   Boolean
+
+  // Relational fields
+  questionId Int
+  question    Question @relation(fields: [questionId], references: [id])
+}
